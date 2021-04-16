@@ -98,6 +98,51 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+"""
+    frontier = {startNode}
+    expanded = {}
+    while frontier is not empty:
+        node = frontier.pop()
+        if isGoal(node):
+            return path_to_node
+        if node not in expanded:
+            expanded.add(node)
+            for each child of node's children:
+                frontier.push(child)
+    return failed
+"""
+def GeneralSearch(problem,ds,heuristic=None):
+    # node = (state,path,cost)
+    fringe = ds()
+    isPQ = isinstance(fringe,util.PriorityQueue)   # check if given data structure is a priority Queue 
+    state = problem.getStartState()
+    start = (state,[],0)
+    if isPQ:
+        h = heuristic(state,problem)
+        fringe.push(start,h)
+    else:
+        fringe.push(start)
+
+    explored = []
+    while not fringe.isEmpty():
+        state,path,backwardCost = fringe.pop()
+        if problem.isGoalState(state):
+            return path
+        if not state in explored:
+            explored.append(state)
+            for child,action,stepCost in problem.expand(state):
+                g = stepCost + backwardCost #actual cost
+                n_path = path.copy()
+                n_path.append(action)
+                if isPQ:
+                    f = g + heuristic(child,problem)
+                    fringe.push((child,n_path,g),f)
+                else:
+                    fringe.push((child,n_path,g))
+    else:
+        return None
+
+    
 
 def tinyMazeSearch(problem):
     """
@@ -124,42 +169,13 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-    fringe = util.Stack()
-    start = (problem.getStartState(),[])
-    fringe.push(start)
-    explored = set()
-    while not fringe.isEmpty():
-        state,path = fringe.pop()
-        if problem.isGoalState(state):
-            return path
-        if not state in explored:
-            explored.add(state)
-            for child,action,stepCost in problem.expand(state):
-                n_path = path.copy()
-                n_path.append(action)
-                fringe.push((child,n_path))
-    else:
-        return None
+    return GeneralSearch(problem,util.Stack)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    fringe = util.Queue()
-    start = (problem.getStartState(),[])
-    fringe.push(start)
-    explored = set()
-    while not fringe.isEmpty():
-        state,path = fringe.pop()
-        if problem.isGoalState(state):
-            return path
-        if not state in explored:
-            explored.add(state)
-            for child,action,stepCost in problem.expand(state):
-                n_path = path.copy()
-                n_path.append(action)
-                fringe.push((child,n_path))
-    else:
-        return None
+    return GeneralSearch(problem,util.Queue)
+    
 
 def nullHeuristic(state, problem=None):
     """
@@ -171,30 +187,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    fringe = util.PriorityQueue()
-    state = problem.getStartState()
-    start = (state,[],0)
-    h = heuristic(state,problem)
-    fringe.push(start,h)
-    explored = set()
-
-    while not fringe.isEmpty():
-        # import pdb; pdb.set_trace()
-        state,path,backwardCost = fringe.pop()
-        if problem.isGoalState(state):
-            return path
-        if state not in explored:
-            explored.add(state)
-            # expand node
-            for child,action, stepCost in  problem.expand(state):
-                actualCost = stepCost + backwardCost
-                # f = g + h
-                f = actualCost + heuristic(child,problem)
-                # Note: make a shallow copy of path otherwise everychange you make to path will be reflected on the next
-                # iteration leading to very undesirable effects
-                thisPath = path.copy()
-                thisPath.append(action)
-                fringe.push((child,thisPath,actualCost),f)
+    return GeneralSearch(problem,util.PriorityQueue,heuristic)
         
 
     
