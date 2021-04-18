@@ -19,13 +19,6 @@ Pacman agents (in searchAgents.py).
 
 import util
 
-class Node:
-    def __init__(self, state,path=[],cost = 0):
-        self.state = state
-        self.path = path
-        self.cost = cost
-    
-
 
         
 
@@ -98,7 +91,9 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
-"""
+
+def GeneralSearch(problem,ds,heuristic=None):
+    """
     frontier = {startNode}
     expanded = {}
     while frontier is not empty:
@@ -111,7 +106,6 @@ class SearchProblem:
                 frontier.push(child)
     return failed
 """
-def GeneralSearch(problem,ds,heuristic=None):
     # node = (state,path,cost)
     fringe = ds()
     isPQ = isinstance(fringe,util.PriorityQueue)   # check if given data structure is a priority Queue 
